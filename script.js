@@ -2,6 +2,7 @@ console.log("app.js loaded");
 
 const taskViewTemplate = document.querySelector("#task-view");
 const taskForm = document.querySelector("#task-form");
+const calendarView = document.querySelector("#calendar-view");
 const calendar = document.querySelector("#calendar");
 
 const months = [
@@ -32,7 +33,7 @@ function initApp() {
     !localStorage.getItem("starts") ||
     !localStorage.getItem("duration");
 
-  calendar.classList.toggle("hide-me", dataMissing);
+  calendarView.classList.toggle("hide-me", dataMissing);
   taskForm.classList.toggle("hide-me", !dataMissing);
 
   if (dataMissing) {
@@ -46,9 +47,15 @@ function initApp() {
   const startDateString = localStorage.getItem("starts");
   const startDate = new Date(startDateString);
   const duration = +localStorage.getItem("duration");
+  const task = localStorage.getItem("task");
+  const name = localStorage.getItem("name");
   const savedCompletions = JSON.parse(
     localStorage.getItem("completions") || "{}",
   );
+
+  document.querySelector("h1").textContent = task;
+  document.querySelector(".sml").textContent = `in ${duration} days`;
+  document.querySelector(".greet").textContent = `Hello ${name}`;
 
   calendar.innerHTML = ""; // Clear existing render if any
   let dayCounter = 0;
@@ -102,6 +109,7 @@ function initApp() {
           input.id = `${thisDay}`;
           input.disabled = thisDay > today; //false;
           input.classList.add("tsk");
+          input.title = taskKey.replace("_", " ").toUpperCase();
         }
       }
     });
@@ -109,14 +117,10 @@ function initApp() {
     calendar.appendChild(newTM);
     incre++;
   }
-  const theDay = document
+
+  document.querySelector(".task-day").textContent = document
     .querySelector(`[id = '${today}']`)
     .value.replace("_", " ");
-
-  document.querySelector(".task-day").textContent = theDay;
-  document.querySelector("h1").textContent = `${localStorage.getItem("task")}`;
-  document.querySelector(".greet").textContent =
-    `Hello ${localStorage.getItem("name")}`;
 
   // Global Navigation Listener
   document.addEventListener("click", (e) => {

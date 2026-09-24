@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <form id="task-form" class="task-form conto">
+    <form id="task-form" class="task-form conto hid-me">
       <div class="st-group">
         <input
           type="text"
@@ -44,18 +44,20 @@
       <button type="submit" style="width: 100%">CONTINUE</button>
     </form>
 
-    <div id="calendar" class="conto">
-      <template id="task-view">
-        <div class="calendar-box" id="">
-          <div class="calendar-head">
-            <h1></h1>
-            <div class="hello flex-center-btwn">
-              <h3 class="greet">Hello</h3>
-              <h3 class="task-day"></h3>
-            </div>
-          </div>
-
-          <div class="calendar-body">
+    <div id="calendar-view" class="hid-me">
+      <div class="calendar-head">
+        <div class="task">
+          <h1></h1>
+          <p class="sml"></p>
+        </div>
+        <div class="hello flex-center-btwn">
+          <h3 class="greet">Hello</h3>
+          <h3 class="task-day"></h3>
+        </div>
+      </div>
+      <div id="calendar" class="conto">
+        <template id="task-view">
+          <div class="calendar-box" id="">
             <div class="month-nav flex-center-btwn">
               <button class="nav prev" value="prev" type="button"><</button>
               <h5 class="month">MONTH NAME</h5>
@@ -113,8 +115,8 @@
               <li class="dt"><input type="checkbox" value="" disabled /></li>
             </ul>
           </div>
-        </div>
-      </template>
+        </template>
+      </div>
     </div>
 
     <script src="script.js"></script>
