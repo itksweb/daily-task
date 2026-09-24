@@ -37,9 +37,9 @@ function initApp() {
   taskForm.classList.toggle("hide-me", !dataMissing);
 
   if (dataMissing) {
-    // document.querySelector("#task_starts").min = new Date()
-    //   .toISOString()
-    //   .split("T")[0];
+    document.querySelector("#task_starts").min = new Date()
+      .toISOString()
+      .split("T")[0];
     return;
   }
 
