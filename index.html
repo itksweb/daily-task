@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Daily Task</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <form id="task-form" class="task-form conto">
+      <div class="st-group">
+        <input
+          type="text"
+          name="name"
+          placeholder="YOUR NAME e.g., John Badmus"
+          class="input tsk st-name"
+          required
+        />
+        <input
+          type="text"
+          name="task"
+          placeholder="TASK e.g., Complete the New Testament"
+          class="input tsk st-name"
+          required
+        />
+        <input
+          type="date"
+          id="task_starts"
+          class="input tsk"
+          name="starts"
+          placeholder="Start Date"
+          min="20"
+          required
+        />
+        <input
+          type="number"
+          name="duration"
+          id="task_duration"
+          class="input tsk"
+          placeholder="Duration in days"
+          required
+        />
+      </div>
+      <button type="submit" style="width: 100%">CONTINUE</button>
+    </form>
+
+    <div id="calendar" class="conto">
+      <template id="task-view">
+        <div class="calendar-box" id="">
+          <div class="calendar-head">
+            <h1></h1>
+            <div class="hello flex-center-btwn">
+              <h3 class="greet">Hello</h3>
+              <h3 class="task-day"></h3>
+            </div>
+          </div>
+
+          <div class="calendar-body">
+            <div class="month-nav flex-center-btwn">
+              <button class="nav prev" value="prev" type="button"><</button>
+              <h5 class="month">MONTH NAME</h5>
+              <button class="nav next" value="next" type="button">></button>
+            </div>
+            <ul class="calendar">
+              <li class="dy">Sun</li>
+              <li class="dy">Mon</li>
+              <li class="dy">Tue</li>
+              <li class="dy">Wed</li>
+              <li class="dy">Thu</li>
+              <li class="dy">Fri</li>
+              <li class="dy">Sat</li>
+              <li class="dt"><input type="checkbox" value="" disabled /></li>
+              <li class="dt"><input type="checkbox" value="" disabled /></li>
+              <li class="dt"><input type="checkbox" value="" disabled /></li>
+              <li class="dt"><input type="checkbox" value="" disabled /></li>
+              <li class="dt"><input type="checkbox" value="" disabled /></li>
+              <li class="dt"><input type="checkbox" value="" disabled /></li>
+              <li class="dt"><input type="checkbox" value="" disabled /></li>
+              <li class="dt"><input type="checkbox" value="" disabled /></li>
+              <li class="dt"><input type="checkbox" value="" disabled /></li>
+              <li class="dt"><input type="checkbox" value="" disabled /></li>
+              <li class="dt"><input type="checkbox" value="" disabled /></li>
+              <li class="dt"><input type="checkbox" value="" disabled /></li>
+              <li class="dt"><input type="checkbox" value="" disabled /></li>
+              <li class="dt"><input type="checkbox" value="" disabled /></li>
+              <li class="dt"><input type="checkbox" value="" disabled /></li>
+              <li class="dt"><input type="checkbox" value="" disabled /></li>
+              <li class="dt"><input type="checkbox" value="" disabled /></li>
+              <li class="dt"><input type="checkbox" value="" disabled /></li>
+              <li class="dt"><input type="checkbox" value="" disabled /></li>
+              <li class="dt"><input type="checkbox" value="" disabled /></li>
+              <li class="dt"><input type="checkbox" value="" disabled /></li>
+              <li class="dt"><input type="checkbox" value="" disabled /></li>
+              <li class="dt"><input type="checkbox" value="" disabled /></li>
+              <li class="dt"><input type="checkbox" value="" disabled /></li>
+              <li class="dt"><input type="checkbox" value="" disabled /></li>
+              <li class="dt"><input type="checkbox" value="" disabled /></li>
+              <li class="dt"><input type="checkbox" value="" disabled /></li>
+              <li class="dt"><input type="checkbox" value="" disabled /></li>
+              <li class="dt"><input type="checkbox" value="" disabled /></li>
+              <li class="dt"><input type="checkbox" value="" disabled /></li>
+              <li class="dt"><input type="checkbox" value="" disabled /></li>
+              <li class="dt"><input type="checkbox" value="" disabled /></li>
+              <li class="dt"><input type="checkbox" value="" disabled /></li>
+              <li class="dt"><input type="checkbox" value="" disabled /></li>
+              <li class="dt"><input type="checkbox" value="" disabled /></li>
+              <li class="dt"><input type="checkbox" value="" disabled /></li>
+              <li class="dt"><input type="checkbox" value="" disabled /></li>
+              <li class="dt"><input type="checkbox" value="" disabled /></li>
+              <li class="dt"><input type="checkbox" value="" disabled /></li>
+              <li class="dt"><input type="checkbox" value="" disabled /></li>
+              <li class="dt"><input type="checkbox" value="" disabled /></li>
+              <li class="dt"><input type="checkbox" value="" disabled /></li>
+            </ul>
+          </div>
+        </div>
+      </template>
+    </div>
+
+    <script src="script.js"></script>
+    <!-- <script src="app.js"></script> -->
+  </body>
+</html>
