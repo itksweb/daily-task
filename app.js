@@ -2,6 +2,7 @@ console.log("app.js loaded");
 
 const taskViewTemplate = document.querySelector("#task-view");
 const taskForm = document.querySelector("#task-form");
+const calendarView = document.querySelector("#calendar-view");
 const calendar = document.querySelector("#calendar");
 
 const months = [
@@ -19,107 +20,179 @@ const months = [
   "DECEMBER",
 ];
 
-const numToString = (num) => String(num).padStart("2", 0);
+const numToString = (num) => String(num).padStart(2, "0");
 
-const weekDayOfMonthDay1 = (date, incre = 0) =>
-  new Date(date.getFullYear(), date.getMonth() + incre, 1).getDay();
+function initApp() {
+  const dataMissing =
+    !localStorage.getItem("name") ||
+    !localStorage.getItem("task") ||
+    !localStorage.getItem("starts") ||
+    !localStorage.getItem("duration");
 
-const monthDays = (date, incre = 0) =>
-  new Date(date.getFullYear(), date.getMonth() + 1 + incre, 0).getDate();
+  // ----- DISPLAYS/HIDES  EITHER THE CALENDAR OR THE INPUT FORM -----
+  // ----- BASED ON AVAILABILITY OF DATA -----
+  calendarView.classList.toggle("hide-me", dataMissing);
+  taskForm.classList.toggle("hide-me", !dataMissing);
 
-const dataMissing =
-  !localStorage.getItem("name") ||
-  !localStorage.getItem("task") ||
-  !localStorage.getItem("starts") ||
-  !localStorage.getItem("duration");
+  if (dataMissing) {
+    // -- MAKE SURE THE USER CAN'T SELECT A PAST START DATE --
+    const todayISO = new Date().toISOString().split("T")[0];
+    document.querySelector("#task_starts").min = todayISO;
+    return;
+  }
 
-calendar.classList.toggle("hide-me", dataMissing);
-taskForm.classList.toggle("hide-me", !dataMissing);
-
-if (!dataMissing) {
-  const startDateString = localStorage.getItem("starts");
-  const startDate = new Date(startDateString);
-  const startMonthIndex = startDate.getMonth();
+  // ----- STORED DATA -----
   const duration = +localStorage.getItem("duration");
+  const task = localStorage.getItem("task");
+  const name = localStorage.getItem("name");
+  const startDateParts = localStorage.getItem("starts").split("-");
+  const savedCompletions = JSON.parse(
+    localStorage.getItem("completions") || "{}",
+  );
+
+  // Construct start date safely using local parameters (Year, Month Index, Day)
+  const startDate = new Date(
+    +startDateParts[0],
+    +startDateParts[1] - 1,
+    +startDateParts[2],
+  );
+
+  // ----- TODAY'S DATE -----
+  const now = new Date();
+  const todayTimestamp = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate(),
+  ).getTime();
+
+  // ----- UPDATE HEADER WITH RELEVANT STORED TEXT -----
+  document.querySelector("h1").textContent = task;
+  document.querySelector(".sml").textContent = `in ${duration} days`;
+  document.querySelector(".greet").textContent = `Hello ${name}`;
+
+  // ----- STARTUP ASSUMPTIONS -----
+  let currentDayLabel = "Not Active Today";
+  let dayCounter = 0;
   let incre = 0;
-  let day = 0;
+  let activeMonthIdx = 0;
 
-  const viewMonth = (dateString, incre = 0) => {
-    const date = new Date(dateString);
-    const monthIndex =
-      startMonthIndex + incre !== 12 ? startMonthIndex + incre : 1;
-    const presentMonthIndex = new Date().getMonth();
+  calendar.innerHTML = ""; // Clear view
 
-    const daysInMonth = monthDays(date, incre);
-    const wkDayOfDay1 = weekDayOfMonthDay1(date, incre);
+  while (dayCounter < duration) {
+    const currentMonthDate = new Date(
+      startDate.getFullYear(),
+      startDate.getMonth() + incre,
+      1,
+    );
+    const monthIndex = currentMonthDate.getMonth();
+    const year = currentMonthDate.getFullYear();
+    const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+    const wkDayOfDay1 = currentMonthDate.getDay();
 
     const newTM = taskViewTemplate.content.cloneNode(true);
     const main = newTM.querySelector(".calendar-box");
-    main.id = monthIndex;
-    main.querySelector("h5").textContent = months[monthIndex];
-    main.querySelector(".prev").disabled = incre === 0;
-    main.querySelector(".next").disabled = duration - day < daysInMonth;
+
+    // ----- ASSIGN SEQUENTIAL INDEX TO EACH VIEW -----
+    // to prevent multi-year & wrap-around ID collisions
+    main.dataset.index = incre;
+    main.querySelector("h5").textContent = `${months[monthIndex]} ${year}`;
+
+    // ----- TRACK ACTIVE MONTH TO DISPLAY INITIAL VIEW -----
+    if (monthIndex === now.getMonth() && year === now.getFullYear()) {
+      activeMonthIdx = incre;
+    }
 
     const boxes = main.querySelectorAll(".dt");
-    main.classList.toggle("hide-me", monthIndex !== presentMonthIndex);
-    let val = 0;
+    let dateVal = 0;
 
     boxes.forEach((el, index) => {
       if (index >= wkDayOfDay1 && index < daysInMonth + wkDayOfDay1) {
-        val += 1;
-        el.prepend(numToString(val));
-        const activeStart = !incre ? date.getDate() : 1;
-        if (val >= activeStart && day < duration) {
-          day += 1;
+        dateVal += 1;
+        el.prepend(numToString(dateVal)); // --- The date displayed on calendar
+
+        // --- activeStart is the 1st date in each month that falls within the task duration
+        const activeStart = incre === 0 ? startDate.getDate() : 1;
+
+        if (dateVal >= activeStart && dayCounter < duration) {
+          dayCounter += 1;
           const input = el.querySelector("input");
-          input.value = `Day ${day}`;
-          input.disabled = false;
+          const taskKey = `day_${dayCounter}`;
+          const cellTimestamp = new Date(year, monthIndex, dateVal).getTime();
+
+          input.value = taskKey;
+          input.checked = !!savedCompletions[taskKey];
+          input.id = `time-${cellTimestamp}`;
+          input.disabled = cellTimestamp > todayTimestamp;
+          input.classList.add("tsk");
+          input.title = taskKey.replace("_", " ").toUpperCase();
+
+          if (cellTimestamp === todayTimestamp) {
+            currentDayLabel = `Day ${dayCounter}`;
+          }
         }
       }
     });
-    calendar.appendChild(newTM);
-    console.log("incre: ", incre, "days elasped: ", day);
-  };
 
-  while (day < duration) {
-    viewMonth(startDateString, incre);
+    calendar.appendChild(newTM);
     incre++;
   }
-  const cals = document.querySelectorAll(".calendar-box");
 
-  document.addEventListener("click", (e) => {
-    if (e.target.matches(".nav")) {
-      e.preventDefault();
-      let targetIndex = +e.target.closest(".calendar-box").id;
-      e.target.matches(".prev") ? targetIndex-- : targetIndex++;
-      cals.forEach((el) =>
-        el.classList.toggle("hide-me", +el.id !== targetIndex),
-      );
-    }
-  });
-} else {
-  document.querySelector("#task_starts").min = new Date()
-    .toISOString()
-    .split("T")[0];
+  // Set header label safely
+  document.querySelector(".task-day").textContent = currentDayLabel;
 
-  // --- FORM SUBMISSION ---
-  taskForm.addEventListener("submit", (e) => {
-    e.preventDefault();
-
-    const missingInput = [...document.querySelectorAll(".tsk")].find(
-      (el) => !el.value,
-    );
-    if (missingInput) {
-      alert("please fill out every form field correctly");
-      return;
-    }
-
-    const formData = new FormData(taskForm);
-    const data = Object.fromEntries(formData.entries());
-    for (const key in data) {
-      if (!Object.hasOwn(data, key)) continue;
-      localStorage.setItem(key, data[key]);
-    }
-    taskForm.reset();
+  // Toggle Visibility & Disable Navigation Buttons
+  const cals = [...document.querySelectorAll(".calendar-box")];
+  cals.forEach((calBox, idx) => {
+    calBox.classList.toggle("hide-me", idx !== activeMonthIdx);
+    calBox.querySelector(".prev").disabled = idx === 0;
+    calBox.querySelector(".next").disabled = idx === cals.length - 1;
   });
 }
+
+// ----- MONTH VIEW NAVIGATION -----
+document.addEventListener("click", (e) => {
+  if (e.target.matches(".nav")) {
+    e.preventDefault();
+    const currentBox = e.target.closest(".calendar-box");
+    const cals = Array.from(document.querySelectorAll(".calendar-box"));
+    const currentIndex = cals.indexOf(currentBox);
+    const targetIndex = e.target.classList.contains("prev")
+      ? currentIndex - 1
+      : currentIndex + 1;
+
+    if (targetIndex >= 0 && targetIndex < cals.length) {
+      cals.forEach((el, idx) =>
+        el.classList.toggle("hide-me", idx !== targetIndex),
+      );
+    }
+  }
+});
+
+// ----- SAVE/UPDATE TASK COMPLETION -----
+document.addEventListener("change", (e) => {
+  if (e.target.value && e.target.value.startsWith("day_")) {
+    const currentSaved = JSON.parse(
+      localStorage.getItem("completions") || "{}",
+    );
+    currentSaved[e.target.value] = e.target.checked;
+    localStorage.setItem("completions", JSON.stringify(currentSaved));
+  }
+});
+
+// ----- HANDLE FORM SUBMISSION -----
+taskForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const formData = new FormData(taskForm);
+  const data = Object.fromEntries(formData.entries());
+  for (const key in data) {
+    localStorage.setItem(key, data[key]);
+  }
+
+  // Clear previous task completion records when starting fresh
+  localStorage.removeItem("completions");
+
+  taskForm.reset();
+  initApp();
+});
+
+initApp();

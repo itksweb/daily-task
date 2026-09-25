@@ -135,8 +135,9 @@
             color: rgb(218, 214, 214);
           }
           &:has(:disabled.tsk) {
-            color: rgb(188, 182, 182);
-            border: solid 1px rgb(209, 220, 250) !important ;
+            color: rgb(193, 191, 191);
+            border: none ;
+            background-color: rgb(239, 251, 253);
           }
         }
       }
